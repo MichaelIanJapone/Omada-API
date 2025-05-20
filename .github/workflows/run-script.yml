@@ -25,4 +25,5 @@ jobs:
 
       - name: Run script
         working-directory: src
-        run: python main.py
+        run: PYTHONPATH=.. python main.py
+
