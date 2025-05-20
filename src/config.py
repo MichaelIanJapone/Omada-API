@@ -1,7 +1,9 @@
-import os
 from dotenv import load_dotenv
+from pathlib import Path
 
-load_dotenv()
+dotenv_path = Path(__file__).parent / '.env'
+load_dotenv(dotenv_path=dotenv_path)
+
 
 BASE_URL = "https://aps1-omada-northbound.tplinkcloud.com"
 EMAIL = os.getenv("OMADA_EMAIL")
