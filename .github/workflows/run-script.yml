@@ -6,14 +6,14 @@ on:
 jobs:
   run-script:
     runs-on: ubuntu-latest
-    timeout-minutes: 360  # 6 hours, the GitHub Actions max
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
-      - name: Set up Python
-        uses: actions/setup-python@v4
+      - name: Show config.py head
+        run: head -20 src/config.py
+
+      - uses: actions/setup-python@v4
         with:
           python-version: '3.10'
 
@@ -22,13 +22,6 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Run script in loop
+      - name: Run script
         working-directory: src
-        shell: bash
-        run: |
-          for i in $(seq 1 70); do
-            echo "Run #$i"
-            PYTHONPATH=.. python main.py || echo "Run $i failed"
-            echo "Sleeping for 5 minutes..."
-            sleep 300
-          done
+        run: PYTHONPATH=.. python main.py
