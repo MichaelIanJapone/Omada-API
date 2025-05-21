@@ -85,11 +85,18 @@ def get_all_past_connections(province_name, creds, influx_writer):
                         last_dt = datetime.fromtimestamp(last_seen / 1000, tz=tz)
 
 
-                        mid_dt = first_dt + (last_dt - first_dt) / 2
-                        point = Point("connection_traffic").time(mid_dt, WritePrecision.MS).field("total_traffic_MB", traffic_mb)
-                        for k, v in tags.items():
-                            point.tag(k, v)
-                        points.append(point)
+mid_dt = first_dt + (last_dt - first_dt) / 2
+
+# 🚫 Skip points older than InfluxDB bucket's allowed minimum time (conservative 1 minute buffer)
+now = datetime.now(timezone.utc)
+if mid_dt.astimezone(timezone.utc) < now - timedelta(minutes=1):
+    continue
+
+point = Point("connection_traffic").time(mid_dt, WritePrecision.MS).field("total_traffic_MB", traffic_mb)
+for k, v in tags.items():
+    point.tag(k, v)
+points.append(point)
+
 
 
                     if points:
