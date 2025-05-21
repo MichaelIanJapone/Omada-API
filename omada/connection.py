@@ -19,8 +19,9 @@ def get_all_past_connections(province_name, creds, influx_writer):
         tz = timezone(timedelta(hours=8))
         
         
-        start_date = datetime(2025, 1, 1, tzinfo=tz) 
-        end_date = datetime.now(tz)  
+        end_date = datetime.now(tz)
+        start_date = end_date - timedelta(days=30)
+  
 
         
         current_start = start_date
