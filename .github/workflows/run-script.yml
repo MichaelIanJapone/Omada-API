@@ -6,6 +6,8 @@ on:
 jobs:
   run-script:
     runs-on: ubuntu-latest
+    timeout-minutes: 360  # 6 hours, the GitHub Actions max
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -22,9 +24,9 @@ jobs:
 
       - name: Run script in loop
         working-directory: src
-        shell: bash  # Use bash for brace expansion
+        shell: bash
         run: |
-          for i in {1..1000}; do
+          for i in $(seq 1 70); do
             echo "Run #$i"
             PYTHONPATH=.. python main.py || echo "Run $i failed"
             echo "Sleeping for 5 minutes..."
