@@ -1,7 +1,7 @@
 name: Run Python Script in Loop with Delay
 
 on:
-  workflow_dispatch:  # Only runs manually or via API trigger
+  workflow_dispatch:
 
 jobs:
   run-script:
@@ -22,10 +22,11 @@ jobs:
 
       - name: Run script in loop
         working-directory: src
+        shell: bash  # Use bash for brace expansion
         run: |
           for i in {1..1000}; do
             echo "Run #$i"
-            PYTHONPATH=.. python main.py
+            PYTHONPATH=.. python main.py || echo "Run $i failed"
             echo "Sleeping for 5 minutes..."
-            sleep 300  # 300 seconds = 5 minutes
+            sleep 300
           done
