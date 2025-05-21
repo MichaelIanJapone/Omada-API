@@ -54,45 +54,45 @@ def get_all_past_connections(province_name, creds, influx_writer):
 
                     points = []
                     for conn in data:
-    mac = conn.get("mac")
-    name = conn.get("name", "")
-    device_name = conn.get("deviceName", "")
-    ssid = conn.get("ssid", "")
-    first_seen = conn.get("firstSeen")
-    last_seen = conn.get("lastSeen")
-    download = conn.get("download", 0)
-    upload = conn.get("upload", 0)
+                        mac = conn.get("mac")
+                        name = conn.get("name", "")
+                        device_name = conn.get("deviceName", "")
+                        ssid = conn.get("ssid", "")
+                        first_seen = conn.get("firstSeen")
+                        last_seen = conn.get("lastSeen")
+                        download = conn.get("download", 0)
+                        upload = conn.get("upload", 0)
 
-    if not (mac and first_seen and last_seen):
-        continue
+                        if not (mac and first_seen and last_seen):
+                            continue
 
-    unique_macs.add(mac)
+                        unique_macs.add(mac)
 
-    traffic_mb = round((download + upload) / (1024 * 1024), 2)
-    session = f"{mac}_{first_seen}_{last_seen}"
-    tags = {
-        "province": province_name,
-        "site": site_name,
-        "mac": mac,
-        "device": name,
-        "ssid": ssid,
-        "ap_name": device_name,
-        "session_id": session
-    }
+                        traffic_mb = round((download + upload) / (1024 * 1024), 2)
+                        session = f"{mac}_{first_seen}_{last_seen}"
+                        tags = {
+                            "province": province_name,
+                            "site": site_name,
+                            "mac": mac,
+                            "device": name,
+                            "ssid": ssid,
+                            "ap_name": device_name,
+                            "session_id": session
+                    }
 
-    first_dt = datetime.fromtimestamp(first_seen / 1000, tz=tz)
-    last_dt = datetime.fromtimestamp(last_seen / 1000, tz=tz)
-    mid_dt = first_dt + (last_dt - first_dt) / 2
+                    first_dt = datetime.fromtimestamp(first_seen / 1000, tz=tz)
+                    last_dt = datetime.fromtimestamp(last_seen / 1000, tz=tz)
+                    mid_dt = first_dt + (last_dt - first_dt) / 2
 
-    # 🚫 Skip points older than InfluxDB bucket's allowed minimum time (conservative 1 minute buffer)
-    now = datetime.now(timezone.utc)
-    if mid_dt.astimezone(timezone.utc) < now - timedelta(minutes=1):
-        continue
+   
+                    now = datetime.now(timezone.utc)
+                    if mid_dt.astimezone(timezone.utc) < now - timedelta(minutes=1):
+                        continue
 
-    point = Point("connection_traffic").time(mid_dt, WritePrecision.MS).field("total_traffic_MB", traffic_mb)
-    for k, v in tags.items():
-        point.tag(k, v)
-    points.append(point)
+                    point = Point("connection_traffic").time(mid_dt, WritePrecision.MS).field("total_traffic_MB", traffic_mb)
+                    for k, v in tags.items():
+                        point.tag(k, v)
+                    points.append(point)
 
 
 
